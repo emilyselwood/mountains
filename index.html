@@ -81,14 +81,16 @@
           const range = find_y(upper, x) - start;
           const y = Math.floor(Math.random() * range) + start;
 
-          const circleEl = document.createElementNS(svgNS, "circle");
-          circleEl.setAttribute("id", "dot-" + id + "-" + i);
-          circleEl.setAttribute("fill", "yellow");
-          circleEl.setAttribute("cx", x);
-          circleEl.setAttribute("cy", y);
-          circleEl.setAttribute("r", "0.5px");
+          if (y) {
+            const circleEl = document.createElementNS(svgNS, "circle");
+            circleEl.setAttribute("id", "dot-" + id + "-" + i);
+            circleEl.setAttribute("fill", "yellow");
+            circleEl.setAttribute("cx", x);
+            circleEl.setAttribute("cy", y);
+            circleEl.setAttribute("r", "0.5px");
 
-          group.appendChild(circleEl);
+            group.appendChild(circleEl);
+          }
         }
 
         parent.appendChild(group);
@@ -102,6 +104,12 @@
           ["#000022", 1],
           ["#000005", 1],
         ];
+
+        const extras = [
+          ["#000099", 2],
+          ["#000088", 2],
+          ["#000077", 2],
+        ]
 
         const embellishments = [
           lights,
@@ -117,16 +125,21 @@
         svgEl.height = height;
         svgEl.setAttribute("viewBox", "0 0 "+width+" "+height);
 
+        let toRender = layers;
+        if (height > width) {
+          toRender = extras.concat(layers);
+        }
+
         // draw a white box first
         draw(svgEl, [[0,0], [width, 0], [width, height], [0, height]], "#FFFFFF", "sky");
 
-        const step = height / (layers.length+1);
+        const step = height / (toRender.length+1);
 
         let current = step;
         let previous = 0;
         let prev_points = [];
-        for (let i = 0; i < layers.length; i++) {
-          const current_points = drawLine(current, current + step, current - step, layers[i][0], layers[i][1], i);
+        for (let i = 0; i < toRender.length; i++) {
+          const current_points = drawLine(current, current + step, current - step, toRender[i][0], toRender[i][1], i);
 
           if (prev_points.length > 0 && Math.random() > 0.9) {
             const embellishment = embellishments[Math.floor(Math.random() * embellishments.length)];
