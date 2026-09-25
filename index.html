@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>mountains</title>
+    <script>
+      const WIDTH = 800;
+      const HEIGHT = 600;
+      const svgNS = "http://www.w3.org/2000/svg";
+
+      function defineLine(mid, upper, lower, step) {
+        let result = [];
+        let prev_y = mid;
+        for (let x = 0; x < WIDTH; x+=step) {
+          let direction = -step;
+          if (prev_y >= upper) {
+            direction = -step;
+          } else if (prev_y <= lower) {
+            direction = step;
+          } else if (Math.random() > 0.5) {
+            direction = step
+          }
+
+          let y = prev_y+direction;
+          result.push([x, y]);
+          prev_y = y;
+        }
+        return result;
+      }
+
+      function drawLine(mid, upper, lower, colour, step, id) {
+        const points = defineLine(mid, upper, lower, step);
+        points.push([WIDTH, HEIGHT]);
+        points.push([0, HEIGHT]);
+
+        let pathStr = points
+          .map(function (point, index) {
+            if (index == 0) {
+              return "M" + point[0] + " " + point[1];
+            }
+            return "L" + point[0] + " " + point[1];
+          })
+          .join(" ");
+
+        pathStr += 'z';
+
+        const svgEl = document.getElementById("image_root");
+
+
+        let g = document.createElementNS(svgNS, "g");
+        g.setAttribute("id", "line-" + id);
+
+        let pathOuter = document.createElementNS(svgNS, "path");
+        pathOuter.setAttribute("id", "outer");
+        pathOuter.setAttribute("stroke-width", "1");
+        pathOuter.setAttribute("stroke", "none");
+        pathOuter.setAttribute("fill", colour);
+        pathOuter.setAttribute("d", pathStr);
+        g.appendChild(pathOuter);
+        svgEl.appendChild(g);
+      }
+
+      function drawMountains() {
+        const layers = [
+            ["#000066", 2],
+          ["#000044", 2],
+          ["#000033", 2],
+          ["#000022", 1],
+          ["#000005", 1],
+          // ["#000099", 2],
+          // ["#0000BB", 1],
+        ];
+
+        const step = HEIGHT / (layers.length+1);
+        console.log(step);
+        let current = step;
+        let previous = 0;
+        for (let i = 0; i < layers.length; i++) {
+          console.log(current);
+          drawLine(current, current + step, current - step, layers[i][0], layers[i][1], i);
+          current += step;
+        }
+
+      }
+
+    </script>
+</head>
+<body onload="drawMountains();" style="margin:0; padding:0;">
+    <svg
+        id="image_root"
+        version="1.1"
+        viewBox="0 0 800 600"
+        width=100%
+        height=100%
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        stroke="black"
+        fill="none"
+        stroke-width="1px"
+        stroke-opacity="1"
+        fill-opacity="1"
+        stroke-linejoin="round"
+    >
+
+    </svg>
+</body>
+</html>
