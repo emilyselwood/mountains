@@ -70,7 +70,7 @@
 
         // draw a white box first
         const svgEl = document.getElementById("image_root");
-        draw(svgEl, [[0,0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT], "#000000", "sky");
+        draw(svgEl, [[0,0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]], "#FFFFFF", "sky");
 
         const step = HEIGHT / (layers.length+1);
         console.log(step);
