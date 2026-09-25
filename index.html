@@ -27,11 +27,7 @@
         return result;
       }
 
-      function drawLine(mid, upper, lower, colour, step, id) {
-        const points = defineLine(mid, upper, lower, step);
-        points.push([WIDTH, HEIGHT]);
-        points.push([0, HEIGHT]);
-
+      function draw(parentEl, points, colour, id) {
         let pathStr = points
           .map(function (point, index) {
             if (index == 0) {
@@ -43,20 +39,22 @@
 
         pathStr += 'z';
 
+        let path = document.createElementNS(svgNS, "path");
+        path.setAttribute("id", "line-" + id);
+        path.setAttribute("stroke-width", "1");
+        path.setAttribute("stroke", "none");
+        path.setAttribute("fill", colour);
+        path.setAttribute("d", pathStr);
+        parentEl.appendChild(path);
+      }
+
+      function drawLine(mid, upper, lower, colour, step, id) {
+        const points = defineLine(mid, upper, lower, step);
+        points.push([WIDTH, HEIGHT]);
+        points.push([0, HEIGHT]);
+
         const svgEl = document.getElementById("image_root");
-
-
-        let g = document.createElementNS(svgNS, "g");
-        g.setAttribute("id", "line-" + id);
-
-        let pathOuter = document.createElementNS(svgNS, "path");
-        pathOuter.setAttribute("id", "outer");
-        pathOuter.setAttribute("stroke-width", "1");
-        pathOuter.setAttribute("stroke", "none");
-        pathOuter.setAttribute("fill", colour);
-        pathOuter.setAttribute("d", pathStr);
-        g.appendChild(pathOuter);
-        svgEl.appendChild(g);
+        draw(svgEl, points, colour, id);
       }
 
       function drawMountains() {
@@ -69,6 +67,10 @@
           // ["#000099", 2],
           // ["#0000BB", 1],
         ];
+
+        // draw a white box first
+        const svgEl = document.getElementById("image_root");
+        draw(svgEl, [[0,0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT], "#000000", "sky");
 
         const step = HEIGHT / (layers.length+1);
         console.log(step);
@@ -84,7 +86,7 @@
 
     </script>
 </head>
-<body onload="drawMountains();" style="margin:0; padding:0;">
+<body onload="drawMountains();" style="margin:0; padding:0; background-color: black;">
     <svg
         id="image_root"
         version="1.1"
