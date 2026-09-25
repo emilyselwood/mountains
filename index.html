@@ -55,6 +55,49 @@
 
         const svgEl = document.getElementById("image_root");
         draw(svgEl, points, colour, id);
+
+        return points;
+      }
+
+      function find_y(line, x) {
+        for (let i = 0; i < line.length; i++) {
+          if (line[i][0] > x) {
+            return line[i-1][1];
+          }
+        }
+        return null;
+      }
+
+      function lights(upper, lower, id, parent) {
+        // generate random points of yellow light across the section
+
+        let group = document.createElementNS(svgNS, "g");
+
+
+        const num_lights = Math.floor(Math.random() * 25 + Math.random() * 25);
+
+        console.log("creating " + num_lights + " lights");
+
+        for (let i = 0; i < num_lights; i++) {
+          const x = Math.floor(Math.random() * WIDTH);
+
+          const start = find_y(lower, x);
+          const range = find_y(upper, x) - start;
+          const y = Math.floor(Math.random() * range) + start;
+
+          const circleEl = document.createElementNS(svgNS, "circle");
+          circleEl.setAttribute("id", "dot-" + id + "-" + i);
+          circleEl.setAttribute("fill", "yellow");
+          circleEl.setAttribute("stroke", "none");
+          circleEl.setAttribute("cx", x);
+          circleEl.setAttribute("cy", y);
+          circleEl.setAttribute("r", "0.5px");
+
+          group.appendChild(circleEl);
+        }
+
+
+        parent.appendChild(group);
       }
 
       function drawMountains() {
@@ -68,17 +111,29 @@
           // ["#0000BB", 1],
         ];
 
-        // draw a white box first
+        const embellishments = [
+          lights,
+        ];
+
         const svgEl = document.getElementById("image_root");
+
+        // draw a white box first
         draw(svgEl, [[0,0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]], "#FFFFFF", "sky");
 
         const step = HEIGHT / (layers.length+1);
         console.log(step);
         let current = step;
         let previous = 0;
+        let prev_points = [];
         for (let i = 0; i < layers.length; i++) {
           console.log(current);
-          drawLine(current, current + step, current - step, layers[i][0], layers[i][1], i);
+          const current_points = drawLine(current, current + step, current - step, layers[i][0], layers[i][1], i);
+
+          if (prev_points.length > 0 && Math.random() > 0.9) {
+            const embellishment = embellishments[Math.floor(Math.random() * embellishments.length)];
+            embellishment(prev_points, current_points, i, svgEl);
+          }
+          prev_points = current_points;
           current += step;
         }
 
