@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>mountains</title>
+    <title>Mountains</title>
     <script>
-      const WIDTH = 800;
-      const HEIGHT = 600;
       const svgNS = "http://www.w3.org/2000/svg";
+
+      let width = 800;
+      let height = 600;
 
       function defineLine(mid, upper, lower, step) {
         let result = [];
         let prev_y = mid;
-        for (let x = 0; x < WIDTH; x+=step) {
+        for (let x = 0; x < width; x+=step) {
           let direction = -step;
           if (prev_y >= upper) {
             direction = -step;
@@ -50,8 +51,8 @@
 
       function drawLine(mid, upper, lower, colour, step, id) {
         const points = defineLine(mid, upper, lower, step);
-        points.push([WIDTH, HEIGHT]);
-        points.push([0, HEIGHT]);
+        points.push([width, height]);
+        points.push([0, height]);
 
         const svgEl = document.getElementById("image_root");
         draw(svgEl, points, colour, id);
@@ -68,18 +69,13 @@
         return null;
       }
 
+      // generate random points of yellow light across the section
       function lights(upper, lower, id, parent) {
-        // generate random points of yellow light across the section
-
         let group = document.createElementNS(svgNS, "g");
 
-
         const num_lights = Math.floor(Math.random() * 25 + Math.random() * 25);
-
-        console.log("creating " + num_lights + " lights");
-
         for (let i = 0; i < num_lights; i++) {
-          const x = Math.floor(Math.random() * WIDTH);
+          const x = Math.floor(Math.random() * width);
 
           const start = find_y(lower, x);
           const range = find_y(upper, x) - start;
@@ -88,7 +84,6 @@
           const circleEl = document.createElementNS(svgNS, "circle");
           circleEl.setAttribute("id", "dot-" + id + "-" + i);
           circleEl.setAttribute("fill", "yellow");
-          circleEl.setAttribute("stroke", "none");
           circleEl.setAttribute("cx", x);
           circleEl.setAttribute("cy", y);
           circleEl.setAttribute("r", "0.5px");
@@ -96,19 +91,16 @@
           group.appendChild(circleEl);
         }
 
-
         parent.appendChild(group);
       }
 
       function drawMountains() {
         const layers = [
-            ["#000066", 2],
+          ["#000066", 2],
           ["#000044", 2],
           ["#000033", 2],
           ["#000022", 1],
           ["#000005", 1],
-          // ["#000099", 2],
-          // ["#0000BB", 1],
         ];
 
         const embellishments = [
@@ -117,16 +109,23 @@
 
         const svgEl = document.getElementById("image_root");
 
-        // draw a white box first
-        draw(svgEl, [[0,0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]], "#FFFFFF", "sky");
+        // init svg el to be the same size as the window as 100% height does odd things.
+        width =  window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-        const step = HEIGHT / (layers.length+1);
-        console.log(step);
+        svgEl.width = width;
+        svgEl.height = height;
+        svgEl.setAttribute("viewBox", "0 0 "+width+" "+height);
+
+        // draw a white box first
+        draw(svgEl, [[0,0], [width, 0], [width, height], [0, height]], "#FFFFFF", "sky");
+
+        const step = height / (layers.length+1);
+
         let current = step;
         let previous = 0;
         let prev_points = [];
         for (let i = 0; i < layers.length; i++) {
-          console.log(current);
           const current_points = drawLine(current, current + step, current - step, layers[i][0], layers[i][1], i);
 
           if (prev_points.length > 0 && Math.random() > 0.9) {
@@ -146,18 +145,15 @@
         id="image_root"
         version="1.1"
         viewBox="0 0 800 600"
-        width=100%
-        height=100%
         xmlns="http://www.w3.org/2000/svg"
         xmlns:svg="http://www.w3.org/2000/svg"
-        stroke="black"
+        stroke="none"
         fill="none"
         stroke-width="1px"
         stroke-opacity="1"
         fill-opacity="1"
         stroke-linejoin="round"
     >
-
     </svg>
 </body>
 </html>
